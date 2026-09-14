@@ -15,7 +15,7 @@ Each release is also published at
   CSRF token, ai-usagebar now reads the CLI's saved Google session from
   `~/.gemini/antigravity-cli/antigravity-oauth-token` when the OS keyring is
   unavailable. The TUI identifies the Cloud Code fallback as
-  `Google API (Antigravity session)`.
+  `Google API (app closed)`.
 
 ## [1.17.0] — 2026-09-12
 

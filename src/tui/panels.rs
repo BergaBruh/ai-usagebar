@@ -855,7 +855,7 @@ fn antigravity_sections(
         v.push(Section::Spacer);
         v.push(Section::Text {
             label: "Source".into(),
-            value: "Google API (Antigravity session)".into(),
+            value: "Google API (app closed)".into(),
         });
     }
     v
@@ -2668,7 +2668,7 @@ mod tests {
         assert!(matches!(
             &remote[n - 1],
             Section::Text { label, value }
-                if label == "Source" && value == "Google API (Antigravity session)"
+                if label == "Source" && value == "Google API (app closed)"
         ));
 
         let local = sections_for(&ready(antigravity_snap(AntigravitySource::Local)), now(), 5);

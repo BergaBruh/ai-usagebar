@@ -30,9 +30,8 @@ defensive and includes opt-in live tests for catching response changes.
 | **Ollama Cloud** | `ollama.com/api/usage` (undocumented; the same route the official ollama.com/settings page calls) | 5-hour session % and weekly %, per-model request counts, last-4-weeks activity cost, config-supplied plan label | No — widget/TUI only |
 
 When Antigravity uses the Cloud Code fallback, the TUI labels the source
-`Google API (Antigravity session)`. This describes the saved Antigravity
-session without claiming whether it came from the OS keyring or the CLI token
-file.
+`Google API (app closed)`. The saved session may come from the OS keyring or
+the CLI token file.
 
 
 ## Providers evaluated and not added
