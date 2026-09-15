@@ -189,8 +189,23 @@ fn read_saved_session(keyring: Option<String>, cli_path: Option<&Path>) -> Optio
 /// Read the read-only OAuth file used by the Antigravity CLI when it cannot
 /// use the OS keyring. The file has the same JSON credential shape as the
 /// keyring blob, including the nested `token` object.
+///
+/// Held to the keyring path's limits rather than trusted because it is a file:
+/// only a regular file is opened — checked before `open`, since opening a FIFO
+/// blocks until a writer appears and this runs inside the widget's fetch — and
+/// at most `MAX_BLOB_BYTES + 1` bytes are read, so a runaway file or a symlink
+/// to a device is rejected by `decode_blob_bytes` instead of filling memory.
 fn read_cli_token_file(path: &Path) -> Option<String> {
-    let bytes = std::fs::read(path).ok()?;
+    use std::io::Read;
+    if !std::fs::metadata(path).ok()?.is_file() {
+        return None;
+    }
+    let mut bytes = Vec::new();
+    std::fs::File::open(path)
+        .ok()?
+        .take(MAX_BLOB_BYTES as u64 + 1)
+        .read_to_end(&mut bytes)
+        .ok()?;
     decode_blob_bytes(&bytes)
 }
 
@@ -480,6 +495,21 @@ mod tests {
         assert_eq!(decode_blob_bytes(&[0xff, 0xfe, 0xfd]), None);
         assert_eq!(decode_blob_bytes(&[0xc3, 0x28]), None);
         assert_eq!(decode_blob_bytes(&vec![b'a'; MAX_BLOB_BYTES + 1]), None);
+    }
+
+    #[test]
+    fn cli_oauth_token_file_rejects_oversized_and_non_regular_paths() {
+        let dir = tempfile::tempdir().unwrap();
+
+        let big = dir.path().join("big");
+        std::fs::write(&big, vec![b'a'; MAX_BLOB_BYTES + 1]).unwrap();
+        assert_eq!(read_cli_token_file(&big), None, "over the blob cap");
+
+        let not_a_file = dir.path().join("a-directory");
+        std::fs::create_dir(&not_a_file).unwrap();
+        assert_eq!(read_cli_token_file(&not_a_file), None, "not a regular file");
+
+        assert_eq!(read_cli_token_file(&dir.path().join("missing")), None);
     }
 
     #[test]

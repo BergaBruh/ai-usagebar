@@ -247,7 +247,7 @@ vendor's response shape drifts:
   quota summary. A refreshed token goes to the vendor cache's
   `oauth.json`, keyed by a fingerprint of the refresh token, never back to
   the keyring. The OAuth client that refresh needs is config-only.
-  Tests must never probe `/proc`, `lsof`, the keyring, Google or the wall
+  Tests must never probe `/proc`, `lsof`, the keyring, the CLI token file, Google or the wall
   clock — use `candidate_bases_with`, `probe_order`,
   `matching_windows_ports`, `parse_lsof_pcn`, `parse_cache_at`, and
   `fetch_snapshot_at` with a `RemoteOverride` (`SavedCredential::Blob` /
